@@ -5,7 +5,7 @@ const program = new Command();
 
 const todosPath = path.join(__dirname,"todos.json");
 
-function readTodos(todosPath){
+function readTodos(){
     if(!fs.existsSync(todosPath)){
         return [];
     }
@@ -33,7 +33,65 @@ program
         console.log(`Added : ${todo}`);
     })
 
+program 
+    .command("done")
+    .argument("<id>")
+    .action((id)=>{
+        let todos = readTodos();
+        let todo = todos.find((todo)=>{
+            return todo.id === parseInt(id);
+        })
+        if(!todo){
+            console.log("Todo not found!");
+        }
+        else{
+            todo.done = true;
+            saveTodos(todos);
+            console.log(`Marked as done : ${todo.task}`);
+        }
+
+    }) 
+    
+program 
+    .command("delete")
+    .argument("<id>")
+    .action((id)=>{
+        let todos = readTodos();
+        let todo = todos.find((todo)=>{
+            return todo.id===parseInt(id)
+        })
+        if(!todo){
+            console.log("Todo not found!");
+        }
+        else{
+            let newTodos = todos.filter((todo)=>{
+            return todo.id!=parseInt(id)
+            })
+            saveTodos(newTodos);
+            console.log(`Deleted : ${todo.task}`)
+        }
+        
+    })    
+
+program   
+    .command("list")
+    .action((todosPath)=>{
+        const todos = readTodos();
+        if(todos.length===0){
+            console.log("No todos yet!");
+        }
+        else{
+            todos.forEach(item=>{
+                console.log(`${item.id} : ${item.done ? '✅' : '⬜'} - ${item.task}` )
+            })
+        }
+        
+    })
+
 program.parse();    
+
+
+
     
 
 
